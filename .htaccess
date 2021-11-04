@@ -1,0 +1,54 @@
+# PHP error handling for production servers
+# Disable display of startup errors
+php_flag display_startup_errors on
+
+# # Disable display of all other errors
+php_flag display_errors on
+
+# # Disable HTML markup of errors
+php_flag html_errors on
+
+
+
+# # Disable ignoring of repeat errors
+# php_flag ignore_repeated_errors off
+
+# # Disable ignoring of unique source errors
+# php_flag ignore_repeated_source off
+
+# # Enable logging of PHP memory leaks
+php_flag report_memleaks on
+
+# # Preserve most recent error via php_errormsg
+php_flag track_errors on
+
+# # Disable formatting of error reference links
+# php_value docref_root 0
+
+# # Disable formatting of error reference links
+# php_value docref_ext 0
+
+# # Enable logging of errors
+php_flag log_errors on
+
+# # Specify path to PHP error log
+php_value error_log "/www/htdocs/w01c010a/Codes/error.log"
+
+# # Specify recording of all PHP errors
+# # [see footnote 3] # php_value error_reporting 999999999
+# php_value error_reporting -1
+
+# # Disable max error string length
+# php_value log_errors_max_len 0
+
+# CustomLog "/www/htdocs/w019dc01/menschen1/error.log" xss
+# #Format the log entry:
+# LogFormat "%h %u %t "%r" %>s "%{Referer}i" "%{User-Agent}i"" xss
+	
+
+# Protect error log by preventing public access
+# <Files error.log>
+#  Order allow,deny
+#  Deny from all
+#  Satisfy All
+# </Files>
