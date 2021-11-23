@@ -1,6 +1,6 @@
 <?php
 include "./dev/pprint.php";
-$username = "kolja1";
+$username = "kolja";
 require "./SleekDB/Store.php";
 // phpinfo();
 ini_set('display_startup_errors', 'On');
@@ -8,12 +8,7 @@ use SleekDB\Store;
 use SleekDB\Query;
 
 
-if (isset($_POST)){
-  echo "POST\n";
-  print_r($_POST);
-  echo "POST\n";
-
-}
+ 
 $databaseDirectory = __DIR__."/db";
 
 // applying the store configuration is optional
@@ -51,25 +46,10 @@ $ItemStore = new Store($username, $databaseDirectory, $storeConfiguration);
 //     );
 // }
 
-$items = $ItemStore->insert($_POST);
-header("Content-Type: application/json");
+// $items = $ItemStore->insertMany($items);
+// header("Content-Type: application/json");
 // echo json_encode($items);
-print_r($items);
-
-
-
-
-
-
-
-
-
-
-
-
-exit;
-
-
+// pprint($items);
 
 
 //
