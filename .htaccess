@@ -1,3 +1,20 @@
+#RewriteEngine On    # Turn on the rewriting engine
+#RewriteRule ^api/([0-9a-zA-Z_-]*)$ api.php?order_id=$1 [NC,L]
+
+RewriteEngine On
+#RewriteBase /Cotes/api/
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+RewriteRule ^(.*)$ api.php?query=$1 [QSA,L]
+
+
+AddDefaultCharset utf-8
+
+
+#
+#
 # PHP error handling for production servers
 # Disable display of startup errors
 php_flag display_startup_errors on

@@ -1,26 +1,103 @@
 <?php
 include "./dev/pprint.php";
-$username = "kolja1";
 require "./SleekDB/Store.php";
 // phpinfo();
-ini_set('display_startup_errors', 'On');
+// error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_WARNING & ~E_STRICT);
+// ini_set("display_errors", 0);
+// ini_set('error_reporting', E_ALL);
+// ini_set('display_startup_errors', 'On');
 use SleekDB\Store;
 use SleekDB\Query;
 
 
-if (isset($_POST)){
-  echo "POST\n";
-  print_r($_POST);
-  echo "POST\n";
 
+
+//
+// JSON OUTPUT
+//
+function printJSON($json){
+  header("Access-Control-Allow-Origin: *");
+  header("Content-Type: application/json; charset=UTF-8");
+  header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
+  header("Access-Control-Max-Age: 3600");
+  header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+  echo json_encode($json);
 }
-$databaseDirectory = __DIR__."/db";
 
-// applying the store configuration is optional
-$storeConfiguration = [
+
+
+
+// DEBUG POST
+if (isset($_POST)){
+  // printJSON($_POST);
+  // pprint($_POST);
+} 
+
+// DEBUG GET
+if (isset($_GET)){ 
+    // pprint($_GET);
+  // printJSON($_GET);
+}
+
+
+
+// mod rewrite in .htaccess
+// https://dev.rasal.de/Cotes/search=%22function()%20%7B]%22in%22css,js%22
+// if(0 === strpos($_GET['query'],'search')){
+//   $parts = explode('"',$_GET['query']);
+//   $needle = $parts[1];
+//   $haystack = $parts[3];
+//   echo "search for '<span style='color:darkred'>".$needle."</span>' in '<span style='color:darkred'>".$haystack."</span>'";
+// }
+
+// exit();
+
+
+/////////////////////////////////////
+
+ 
+
+
+//////////////////////////////////////////////
+// get and split uri with PHP
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$urlParts = explode('/',$uri);
+if ((isset($urlParts[2]) && $urlParts[2] != 'api')) {
+  // header("HTTP/1.1 404 Not Found");
+  // echo "no API call";
+  // exit();
+}
+foreach ($urlParts as $key => $value) {
+
+  // https://dev.rasal.de/Codes/api/search=vue,php
+  if(0 === strpos($value,'search=')){
+    $value = str_replace('search=','',$value);
+    $items = explode(',', $value);
+    $case = 'search';
+  }
+  // https://dev.rasal.de/Codes/api/ID/33
+  if(0 === strpos($value,'ID')){
+    $value = str_replace('ID','',$value);
+    $ID = $urlParts[$key+1];
+    $case = 'ID';
+  }
+}
+// pprint($ID);
+// pprint($items);
+// pprint($urlParts);
+
+
+
+
+$conf=[];
+
+//
+// STORE CONFIG
+// 
+$conf['storeConf'] = [
   "auto_cache" => true,
   "cache_lifetime" => null,
-  "timeout" => 120,
+  // "timeout" => 120,
   "primary_key" => "_id",
   "search" => [
     "min_length" => 2,
@@ -30,68 +107,105 @@ $storeConfiguration = [
   ]
 ];
 
-// creating a new store object
-$ItemStore = new Store($username, $databaseDirectory, $storeConfiguration);
 
- 
 //
-// create random items
+// CREATE NEW STORE
+$conf['DBdir'] = "/db";
+$conf['Username'] = "kolja2";
+$conf['ItemStore'] = new Store($conf['Username'], __DIR__.$conf['DBdir'], $conf['storeConf']); 
+
 //
-// $items =[];
-// for ($i=0; $i < 255; $i++){
-//   $rLang = rLang();
-//     $items[] = array(
-//       "titel" => "Code_".$i,
-//       "date_cre" => rDate()['cre'],
-//       "date_mod" => rDate()['mod'],
-//       "lang" =>$rLang,
-//       "tags" => rTags(),
-//       "code" => rCode($rLang),
-//       "desc" => file_get_contents('https://loripsum.net/generate.php?p=1&l=short&d=1&a=1&ul=1&ol=1&dl=1&bq=1&pr=1'),
-//     );
+// creating a new store object
+//
+if(isset($_GET['create']) && isset($_POST)){
+  $newItems = $_POST;
+  // TEST
+  $rDates = rDate();
+  $newItems['date'] = $rDates['cre'];
+  $newItems['date_mod'] = $rDates['mod'];
+  $lang = rLang();
+  $newItems['lang'] = $lang;
+  $newItems['code'] = rCode($lang);
+  $newItems['tags'] = rTags();
+  $newItems['desc'] = file_get_contents('https://loripsum.net/generate.php?p=1');
+  // insert items in db
+  $items = $conf['ItemStore']->insert($newItems);
+  // header("Content-Type: application/json");
+  // echo json_encode($items);
+  // print_r($items);
+} 
+
+
+
+
+
+//
+// all Items
+//
+// if(isset($_GET['all'])){
+//   $result = $conf['ItemStore']->findAll();
+//   pprint($result);
+//   exit;
 // }
 
-$items = $ItemStore->insert($_POST);
-header("Content-Type: application/json");
-// echo json_encode($items);
-print_r($items);
 
-
-
-
-
-
-
-
-
-
-
-
-exit;
-
-
+ 
 
 
 //
 // search Items
 //
-$page = 1;
-$limit = 10;
-$skip = ($page - 1) * $limit;
+// if(isset($_GET['search'])){
+//   $searchOptions = [
+//     "minLength" => 2,
+//     "mode" => "or",
+//     "scoreKey" => "scoreKey",
+//     "algorithm" => Query::SEARCH_ALGORITHM["hits"]
+//   ];
+//   $result =  $conf['ItemStore']->createQueryBuilder()
+//   ->search(["lang","desc"], "PHP", $searchOptions)
+//   ->getQuery()
+//   ->fetch();
 
-$result = $ItemStore->createQueryBuilder()
-  ->where([
-    ["tags", "IN", ["CSS", "JS"]] 
-  ])
-  ->orderBy(["_id" => "DESC"])
+//   // pprint($result);
+//   printJSON($result);
+//   exit;
+// }
+
+
+// DEBUG GET
+// if (isset($_GET['search'])){ 
+//   search('Lorem','lang, desc');
+// }
+
+$data = json_decode(file_get_contents('php://input'), true);
+if($data['search']){
+  $needle = trim($data['search']['needle'],'"');
+  $haystack = trim($data['search']['haystack'],'"');
+  // printJSON($data);
+  search($needle,$haystack);
+}
+
  
+
+function search($needle,$haystack){ 
+  global $conf;
+  $haystack = explode(',', $haystack);
+  $searchOptions = [
+    "minLength" => 2,
+    "mode" => "or",
+    "scoreKey" => "scoreKey",
+    "algorithm" => Query::SEARCH_ALGORITHM["hits"]
+  ];
+  $result =  $conf['ItemStore']->createQueryBuilder()
+  ->search($haystack, $needle, $searchOptions)
   ->getQuery()
   ->fetch();
 
-// Output
-header("Content-Type: application/json");
-echo json_encode($result);
-// pprint($result);
+  // pprint($result);
+  printJSON($result);
+  exit;
+}
 
 
 
@@ -104,6 +218,18 @@ echo json_encode($result);
 
 
 
+
+
+
+
+
+
+
+
+
+//
+// RANDOM FUNCTIONS
+//
 function rDate(){
   $min = strtotime('10.02.1982');
   $max = strtotime('01.01.2000');
@@ -159,37 +285,28 @@ function rCode($lang){
         case 'Python':
         return "
         # Program make a simple calculator
-
         # This function adds two numbers
         def add(x, y):
             return x + y
-
         # This function subtracts two numbers
         def subtract(x, y):
             return x - y
-
         # This function multiplies two numbers
         def multiply(x, y):
             return x * y
-
         # This function divides two numbers
         def divide(x, y):
             return x / y
-
-
         print(\"Select operation.\")
         print(\"1.Add\")
         print(\"2.Subtract\")
         print(\"3.Multiply\")
         print(\"4.Divide\")
-
         while True:
             # take input from the user
             choice = input(\"Enter choice(1/2/3/4): \")
       ";
       break;
-
-
       case 'PHP':
         return "
         $colors = array(\"red\", \"green\", \"blue\", \"yellow\"); 
@@ -199,32 +316,24 @@ function rCode($lang){
         }
         ";
         break;
-
-
       case 'VB':
         return "
         Sub Main()
-
         On Error GoTo Failed
-
           Dim app As Netica.Application
           app = New Netica.Application
           app.Visible = True
-
           Dim net_file_name As String
           net_file_name = System.AppDomain.CurrentDomain.BaseDirectory() & \"..\..\..\ChestClinic.dne\"
           Dim net As Netica.Bnet
           net = app.ReadBNet(app.NewStream(net_file_name))
           net.Compile()
           Exit Sub
-
         Failed:
           MsgBox(\"NeticaDemo: Error \" & (Err.Number And &H7FFFS) & \": \" & Err.Description)
         End Sub
         ";
         break;
-
-
       case 'HTML':
         return "
         <table style=\"width:100%\">
@@ -251,7 +360,6 @@ function rCode($lang){
         </table>
         ";
         break;
-
         case 'Vue':
           return "
             <div id=\"app-4\">
@@ -261,7 +369,6 @@ function rCode($lang){
               </li>
             </ol>
           </div>
-          
           var app4 = new Vue({
             el: '#app-4',
             data: {
@@ -274,8 +381,6 @@ function rCode($lang){
           })
           ";
           break;
-
-
           case 'JS':
             return "
             class Rectangle {
@@ -298,10 +403,6 @@ function rCode($lang){
             console.log(square.area) // 100
             ";
             break;
-
-
-
-
           case 'JSON':
             return "
             {
@@ -318,7 +419,6 @@ function rCode($lang){
                 \"nano\",
                 \"tmux\"
               ],
-
               // Experimentell: Länge der Netzwerkverzögerung in Millisekunden, mit der lokale Bearbeitungen auf dem Terminal ausgegeben werden, ohne auf Serverbestätigung zu warten.  
               \"terminal.integrated.localEchoLatencyThreshold\": 30,
 
@@ -332,11 +432,7 @@ function rCode($lang){
               \"terminal.integrated.macOptionIsMeta\": false,
             }
             ";
-            break;
-
-
-  
-
+            break; 
       default:
         return "
         empyt

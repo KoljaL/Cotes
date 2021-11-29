@@ -14,12 +14,13 @@
       src: url('css/fonts/PublicSans-Light.woff2') format('woff2');
 
        border #444c56
-
-
+ 
       } */
     @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@300&display=swap');
 
-    :root {
+    /* :root { */
+    [data-theme='light'] {
+
         --BodyBackground: whitesmoke;
         --FieldsetLegend: black;
         --FieldsetBorder: black;
@@ -47,7 +48,94 @@
         --CheckboxCheckedInside: black;
     }
 
-    [data-theme='dark'] {
+
+    [data-theme='sleek'] {
+        /* COLORS */
+        --dark0: #232327;
+        --dark1: #27272b;
+        --dark2: #2c2c31;
+        --font0: #d7d7d8;
+        --font1: #d6d6d9;
+        --font2: #696969;
+        --fontSalomon: #c19c90;
+        --fontBlue: #2798e4;
+        --fontViolet: #988cca;
+        --fontYellow: #c9ac57;
+        --fontOrange: #cb7832;
+        --fontRed: #e9553b;
+        --fontGreen: #6a8759;
+        /* SET */
+        --BodyBackground: var(--dark1);
+        --FieldsetLegend: #adbac7;
+        --FieldsetBorder: black;
+        --FieldsetShadow: black;
+        --FieldsetBackground: var(--dark0);
+        --LabelLarge: var(--font2);
+        --LabelTop: var(--font2);
+        --LabelTopBackground: transparent;
+        --LabelBorderActive: #444c56;
+        --LabelShadowActive: black;
+        --InputText: #adbac7;
+        --InputBackground: var(--dark2);
+        --InputBorder: #444c56;
+        --InputBorder: black;
+        --InputShadow: black;
+        --InputShadowHover: black;
+        --InputShadowFocus: black;
+        --ListBoxBackground: #22272e;
+        --ScrollbarBackground: #22272e;
+        --ScrollbaThumb: #768390;
+        --ListBoxLiChecked: #1c2128;
+        --ListBoxLiHover: #1c2128;
+        --CheckboxCheckedBackground: #22272e;
+        --CheckboxCheckedShadow: black;
+        --CheckboxCheckedInside: black;
+    }
+
+
+    [data-theme='color'] {
+        /* COLORS */
+        --dark0: #bbb;
+        --dark1: #ccc;
+        --dark2: #ddd;
+        --font0: #d7d7d8;
+        --font1: #d6d6d9;
+        --font2: #696969;
+        --fontSalomon: #c19c90;
+        --fontBlue: #2798e4;
+        --fontViolet: #988cca;
+        --fontYellow: #c9ac57;
+        --fontOrange: #cb7832;
+        --fontRed: #e9553b;
+        --fontGreen: #6a8759;
+        /* SET */
+        --BodyBackground: var(--dark1);
+        --FieldsetLegend: var(--fontViolet);
+        --FieldsetBorder: black;
+        --FieldsetShadow: black;
+        --FieldsetBackground: var(--dark0);
+        --LabelLarge: var(--fontViolet);
+        --LabelTop: var(--fontGreen);
+        --LabelTopBackground: transparent;
+        --LabelBorderActive: #444c56;
+        --LabelShadowActive: black;
+        --InputText: var(--fontBlue);
+        --InputBackground: var(--dark2);
+        --InputBorder: black;
+        --InputShadow: black;
+        --InputShadowHover: black;
+        --InputShadowFocus: black;
+        --ListBoxBackground: var(--dark2);
+        --ScrollbarBackground: #22272e;
+        --ScrollbaThumb: #768390;
+        --ListBoxLiChecked: var(--fontYellow);
+        --ListBoxLiHover: var(--fontYellow);
+        --CheckboxCheckedBackground: #ccc;
+        --CheckboxCheckedShadow: black;
+        --CheckboxCheckedInside: var(--fontBlue);
+    }
+
+    [data-theme='github'] {
         --BodyBackground: #22272e;
         --FieldsetLegend: #adbac7;
         --FieldsetBorder: black;
@@ -433,31 +521,29 @@
     </div>
 
 
+    <script>
+    // set modes
+    let modes = ['sleek', 'github', 'light','color']
+    // set default mode (if no :root{})
+    document.documentElement.setAttribute('data-theme', modes[0]);
+    // create toggle button
+    let ThemeToggle = document.createElement('span');
+    ThemeToggle.setAttribute('style', 'position: absolute; top: 10px; right: 20px; cursor: pointer');
+    ThemeToggle.setAttribute('id', 'darkmodecheckbox');
+    ThemeToggle.innerHTML = '&#127912;';
+    ThemeToggle.addEventListener('click', toggleTheme, false);
+    document.body.appendChild(ThemeToggle);
+    // toggle theme function 
+    function toggleTheme() {
+        let mode = document.documentElement.getAttribute('data-theme');
+        let modeIndex = modes.indexOf(mode) + 1;
+        if (modeIndex === modes.length) modeIndex = 0
+        document.documentElement.setAttribute('data-theme', modes[modeIndex]);
+    }
+    </script>
+
     <div class="center">
 
-        <label style="position: absolute; top: 10px; right: 20px" for="darkmodecheckbox">
-            <input type="checkbox" id="darkmodecheckbox" style="display: none" />
-            <em id="darkmodelable" style="color: dimgrey; cursor: pointer">Enable Dark Mode</em>
-        </label>
-        <script>
-        const toggleSwitch = document.getElementById('darkmodecheckbox');
-        document.documentElement.setAttribute('data-theme', 'dark');
-        document.getElementById('darkmodelable').style.color = '#dimgrey';
-        document.getElementById('darkmodelable').innerHTML = 'Enable Light Mode';
-
-        function switchTheme(e) {
-            if (e.target.checked) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                document.getElementById('darkmodelable').style.color = '#dimgrey';
-                document.getElementById('darkmodelable').innerHTML = 'Enable Light Mode';
-            } else {
-                document.getElementById('darkmodelable').innerHTML = 'Enable Dark Mode';
-                document.getElementById('darkmodelable').style.color = '#768390';
-                document.documentElement.setAttribute('data-theme', 'light');
-            }
-        }
-        toggleSwitch.addEventListener('change', switchTheme, false);
-        </script>
         <div id="FORM"></div>
         <div id="FORMVALUES" style="opacity: 0"></div>
     </div>
@@ -491,16 +577,6 @@
             if ('textarea' === d.type) {
                 form.appendChild(createTextarea(d));
             }
-
-            // checkboxGroup
-            // let divChk = document.createElement('div');
-            // divChk.setAttribute('class', 'checkboxGroup');
-            // if ('checkboxGroup' === d.type) {
-            //     d.items.forEach((i) => {
-            //         divChk.appendChild(createcheckboxGroup(i));
-            //     });
-            //     form.appendChild(divChk);
-            // }
 
             // SELECT
             if ('select' === d.type) {
@@ -580,25 +656,6 @@
             return div;
         }
 
-        //
-        // CREATE CHECKBOXGROUP
-        //
-        // function createcheckboxGroup(d) {
-        //     // SOURROUNDING DIV
-        //     let div = document.createElement('div');
-        //     div.setAttribute('class', 'CheckboxElement');
-        //     // INPUT FIELD
-        //     let input = document.createElement('input');
-        //     input.setAttribute('type', 'checkbox');
-        //     input.setAttribute('name', d.name);
-        //     // LABEL
-        //     let label = document.createElement('label');
-        //     label.textContent = d.name;
-        //     // CONCAT EVERYTHING
-        //     div.appendChild(input);
-        //     div.appendChild(label);
-        //     return div;
-        // }
 
         //
         // CREATE INPUT TEXT
@@ -807,7 +864,7 @@
                 true
             );
         });
-    }); 
+    });
     </script>
 
     <script id="FORMSUBMIT">
@@ -815,6 +872,7 @@
 
         //
         // SET SUBMIT BUTTON STATE
+        //
         document.getElementById('submitButton').addEventListener('mousedown', function() {
             this.classList.add('submitButtonActive');
             this.addEventListener('mouseup', function() {
@@ -895,15 +953,15 @@
         function sendData() {
             const XHR = new XMLHttpRequest();
             const FD = new FormData(form);
-            XHR.addEventListener('load', function (event) {
+            XHR.addEventListener('load', function(event) {
                 deb(event.target.responseText);
             });
-            XHR.addEventListener('error', function (event) {
+            XHR.addEventListener('error', function(event) {
                 deb('Oops! Something went wrong.');
             });
-            XHR.open('POST', 'api.php');
-            deb(form);
-            deb(FD);
+            XHR.open('POST', 'api.php?create');
+            // deb(form);
+            // deb(FD);
             XHR.send(FD);
         }
         const form = document.querySelector('#FORM form');
