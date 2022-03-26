@@ -1,3 +1,5 @@
+very &alpha; and not longer in development
+
 # Cotes
 A [Co]()de No[tes]() Manager
 
